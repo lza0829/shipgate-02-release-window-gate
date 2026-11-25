@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { api } from '../api'
+import { OowBadge } from '../components/Badge'
 
 export default function Overview() {
   const [data, setData] = useState(null)
@@ -20,21 +21,28 @@ export default function Overview() {
       <h2>在途发版</h2>
       <div className="table-wrap">
         <table>
-          <thead><tr><th>发版单号</th><th>应用</th><th>目标版本</th><th>状态</th><th>当前环境</th><th>流水线</th></tr></thead>
+          <thead><tr><th>发版单号</th><th>应用</th><th>目标版本</th><th>状态</th><th>当前环境</th><th>流水线</th><th>窗态</th></tr></thead>
           <tbody>
             {(data.在途 || []).map((r) => (
-              <tr key={r.编号}><td>{r.发版单号}</td><td>{r.应用}</td><td>{r.目标版本}</td><td>{r.状态}</td><td>{r.当前环境 || '-'}</td><td>{r.流水线}</td></tr>
+              <tr key={r.编号}>
+                <td>{r.发版单号}</td><td>{r.应用}</td><td>{r.目标版本}</td><td>{r.状态}</td>
+                <td>{r.当前环境 || '-'}</td><td>{r.流水线}</td>
+                <td><OowBadge value={r.时段外} /></td>
+              </tr>
             ))}
           </tbody>
         </table>
       </div>
-      <h2>各环境版本</h2>
+      <h2>各环境版本（名册）</h2>
       <div className="table-wrap">
         <table>
-          <thead><tr><th>应用</th><th>环境</th><th>版本</th><th>更新时间</th></tr></thead>
+          <thead><tr><th>应用</th><th>环境</th><th>版本</th><th>窗态</th><th>更新时间</th></tr></thead>
           <tbody>
             {(data.环境版本 || []).map((v, i) => (
-              <tr key={i}><td>{v.应用}</td><td>{v.环境}</td><td>{v.版本}</td><td>{v.更新时间}</td></tr>
+              <tr key={i}>
+                <td>{v.应用}</td><td>{v.环境}</td><td>{v.版本}</td>
+                <td><OowBadge value={v.时段外} /></td><td>{v.更新时间}</td>
+              </tr>
             ))}
           </tbody>
         </table>

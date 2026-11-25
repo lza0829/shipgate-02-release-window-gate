@@ -51,6 +51,7 @@ SELECT r.id AS 编号,
        e.name AS 当前环境名,
        r.canary_ratio AS 金丝雀比例,
        r.note AS 备注,
+       r.out_of_window AS 时段外,
        r.created_at AS 申请时间,
        r.admitted_at AS 入闸时间,
        r.released_at AS 放行时间,
@@ -97,6 +98,12 @@ def active_release_window(conn, env_id: int):
     ).fetchone()
 
 
+def release_window_open(conn, env_id: int) -> bool:
+    """时段闸唯一判定：目标环境存在状态为窗开的放行窗即时段内，否则时段外。
+    读侧重放与写口都只能调这一条，禁止另立规则。"""
+    return active_release_window(conn, env_id) is not None
+
+
 def active_rollback_window(conn, env_id: int):
     return conn.execute(
         """
@@ -108,34 +115,39 @@ def active_rollback_window(conn, env_id: int):
     ).fetchone()
 
 
-def set_app_env_version(conn, app_id: int, env_id: int, version: str) -> None:
+def set_app_env_version(conn, app_id: int, env_id: int, version: str,
+                        in_window: bool = True) -> None:
     conn.execute(
         """
-        INSERT INTO app_env_versions(app_id, env_id, version, updated_at)
-        VALUES (?, ?, ?, ?)
-        ON CONFLICT(app_id, env_id) DO UPDATE SET version=excluded.version, updated_at=excluded.updated_at
+        INSERT INTO app_env_versions(app_id, env_id, version, in_window, updated_at)
+        VALUES (?, ?, ?, ?, ?)
+        ON CONFLICT(app_id, env_id) DO UPDATE SET
+          version=excluded.version,
+          in_window=excluded.in_window,
+          updated_at=excluded.updated_at
         """,
-        (app_id, env_id, version, now_str()),
+        (app_id, env_id, version, int(in_window), now_str()),
     )
 
 
-def upsert_instance(conn, app_id: int, env_id: int, version: str, health: str, release_id: int | None) -> None:
+def upsert_instance(conn, app_id: int, env_id: int, version: str, health: str,
+                    release_id: int | None, in_window: bool = True) -> None:
     row = conn.execute(
         "SELECT id FROM instances WHERE app_id=? AND env_id=? AND version=?",
         (app_id, env_id, version),
     ).fetchone()
     if row:
         conn.execute(
-            "UPDATE instances SET health=?, release_id=?, updated_at=? WHERE id=?",
-            (health, release_id, now_str(), row["id"]),
+            "UPDATE instances SET health=?, release_id=?, in_window=?, updated_at=? WHERE id=?",
+            (health, release_id, int(in_window), now_str(), row["id"]),
         )
     else:
         conn.execute(
             """
-            INSERT INTO instances(app_id, env_id, version, health, release_id, updated_at)
-            VALUES (?, ?, ?, ?, ?, ?)
+            INSERT INTO instances(app_id, env_id, version, health, in_window, release_id, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
             """,
-            (app_id, env_id, version, health, release_id, now_str()),
+            (app_id, env_id, version, health, int(in_window), release_id, now_str()),
         )
 
 

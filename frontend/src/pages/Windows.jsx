@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { api } from '../api'
+import { WindowBadge } from '../components/Badge'
 
 export default function Windows() {
   const [rel, setRel] = useState([])
@@ -40,8 +41,14 @@ export default function Windows() {
       <h2>放行窗</h2>
       <div className="table-wrap">
         <table>
-          <thead><tr><th>环境</th><th>开启</th><th>关闭</th><th>状态</th></tr></thead>
-          <tbody>{rel.map((w) => <tr key={w.编号}><td>{w.环境}</td><td>{w.开启}</td><td>{w.关闭}</td><td>{w.状态}</td></tr>)}</tbody>
+          <thead><tr><th>环境</th><th>开启</th><th>关闭</th><th>状态</th><th>最近开窗</th><th>最近关窗</th></tr></thead>
+          <tbody>{rel.map((w) => (
+            <tr key={w.编号}>
+              <td>{w.环境}</td><td>{w.开启}</td><td>{w.关闭}</td>
+              <td><WindowBadge status={w.状态} /></td>
+              <td>{w.最近开窗 || '-'}</td><td>{w.最近关窗 || '-'}</td>
+            </tr>
+          ))}</tbody>
         </table>
       </div>
       <h2>回滚窗</h2>

@@ -36,8 +36,11 @@ def seed_if_empty() -> None:
         close_at = (datetime.now() + timedelta(hours=6)).strftime("%Y-%m-%d %H:%M:%S")
         for code in ("测", "预", "产"):
             conn.execute(
-                "INSERT INTO release_windows(env_id, open_at, close_at, status) VALUES (?, ?, ?, '窗开')",
-                (envs[code], open_at, close_at),
+                """
+                INSERT INTO release_windows(env_id, open_at, close_at, status, last_opened_at)
+                VALUES (?, ?, ?, '窗开', ?)
+                """,
+                (envs[code], open_at, close_at, now),
             )
             conn.execute(
                 "INSERT INTO rollback_windows(env_id, open_at, close_at, status) VALUES (?, ?, ?, '窗开')",
@@ -49,8 +52,7 @@ def seed_if_empty() -> None:
             INSERT INTO settings(key, value) VALUES
               ('允许跳级', '否'),
               ('金丝雀默认比例', '10'),
-              ('入闸须流水线绿', '是'),
-              ('维护窗硬拒', '是')
+              ('入闸须流水线绿', '是')
             """
         )
 

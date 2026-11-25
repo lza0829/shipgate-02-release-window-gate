@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { api } from '../api'
+import { OowBadge } from '../components/Badge'
 
 export default function Health() {
   const [rows, setRows] = useState([])
@@ -19,11 +20,13 @@ export default function Health() {
       {err && <p className="err">{err}</p>}
       <div className="table-wrap">
         <table>
-          <thead><tr><th>应用</th><th>环境</th><th>版本</th><th>健康</th><th>发版单</th><th>操作</th></tr></thead>
+          <thead><tr><th>应用</th><th>环境</th><th>版本</th><th>健康</th><th>窗态</th><th>发版单</th><th>操作</th></tr></thead>
           <tbody>
             {rows.map((r) => (
               <tr key={r.编号}>
-                <td>{r.应用}</td><td>{r.环境}</td><td>{r.版本}</td><td>{r.健康}</td><td>{r.发版单编号 || '-'}</td>
+                <td>{r.应用}</td><td>{r.环境}</td><td>{r.版本}</td><td>{r.健康}</td>
+                <td><OowBadge value={r.时段外} /></td>
+                <td>{r.发版单编号 || '-'}</td>
                 <td>
                   <button type="button" onClick={() => setH(r.编号, '探针绿')}>探针绿</button>{' '}
                   <button type="button" className="danger" onClick={() => setH(r.编号, '探针红')}>探针红</button>

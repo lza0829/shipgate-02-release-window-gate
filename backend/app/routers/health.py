@@ -18,7 +18,8 @@ def list_instances():
             conn.execute(
                 """
                 SELECT i.id AS 编号, a.name AS 应用, e.code AS 环境, e.name AS 环境名,
-                       i.version AS 版本, i.health AS 健康, i.release_id AS 发版单编号,
+                       i.version AS 版本, i.health AS 健康, (1 - i.in_window) AS 时段外,
+                       i.release_id AS 发版单编号,
                        i.updated_at AS 更新时间
                 FROM instances i
                 JOIN apps a ON a.id = i.app_id

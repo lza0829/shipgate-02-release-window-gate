@@ -168,9 +168,13 @@ body {
   letter-spacing: 0.04em;
 }
 .stat .l { color: var(--muted); font-size: 0.86rem; margin-top: 0.2rem; }
+.stat.stat-oow { border-bottom-color: #b9770e; }
+.stat.stat-oow .n { color: #b9770e; }
 
 .row { display: flex; flex-wrap: wrap; gap: 0.65rem; margin: 0.75rem 0; align-items: end; }
 label { display: flex; flex-direction: column; gap: 0.28rem; font-size: 0.86rem; color: var(--muted); }
+label.inline-check { flex-direction: row; align-items: center; gap: 0.4rem; }
+label.inline-check input { min-width: 0; width: auto; }
 input, select {
   min-width: 140px;
   padding: 0.42rem 0.55rem;
@@ -207,6 +211,49 @@ button.danger {
 }
 .muted { color: var(--muted); font-size: 0.9rem; }
 .err { color: var(--danger); white-space: pre-wrap; }
+
+.badge {
+  display: inline-block;
+  padding: 0.1rem 0.45rem;
+  font-size: 0.78rem;
+  letter-spacing: 0.05em;
+  border: 1px solid;
+  white-space: nowrap;
+}
+.badge-in { color: var(--ok); border-color: var(--ok); background: rgba(42, 143, 110, 0.08); }
+.badge-oow { color: #b9770e; border-color: #b9770e; background: rgba(185, 119, 14, 0.1); font-weight: 700; }
+.badge-closed { color: var(--danger); border-color: var(--danger); background: rgba(192, 57, 43, 0.08); font-weight: 700; }
+
+.gate-box {
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--steel);
+  background: #fff;
+  padding: 0.7rem 0.85rem;
+  margin: 0.6rem 0;
+  font-size: 0.9rem;
+}
+.gate-box.gate-ok { border-left-color: var(--ok); }
+.gate-box.gate-warn { border-left-color: #b9770e; background: rgba(185, 119, 14, 0.06); }
+.gate-box .gate-title { font-weight: 700; margin-bottom: 0.25rem; }
+.receipt {
+  border: 1px solid var(--ok);
+  border-left: 4px solid var(--ok);
+  background: rgba(42, 143, 110, 0.07);
+  padding: 0.7rem 0.85rem;
+  margin: 0.6rem 0;
+  font-size: 0.9rem;
+}
+.receipt.receipt-oow {
+  border-color: #b9770e;
+  border-left-color: #b9770e;
+  background: rgba(185, 119, 14, 0.08);
+}
+button.warn {
+  background: #b9770e;
+  border-color: #8e5a0b;
+}
+button.warn:hover { background: #8e5a0b; }
+button:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
 
 .table-wrap { overflow: auto; }
 table {

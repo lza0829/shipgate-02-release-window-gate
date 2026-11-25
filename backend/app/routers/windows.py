@@ -19,7 +19,8 @@ def list_release_windows():
             conn.execute(
                 """
                 SELECT w.id AS 编号, e.code AS 环境, e.name AS 环境名,
-                       w.open_at AS 开启, w.close_at AS 关闭, w.status AS 状态
+                       w.open_at AS 开启, w.close_at AS 关闭, w.status AS 状态,
+                       w.last_opened_at AS 最近开窗, w.last_closed_at AS 最近关窗
                 FROM release_windows w JOIN environments e ON e.id = w.env_id
                 ORDER BY e.sort_order, w.id DESC
                 """
@@ -54,9 +55,19 @@ def toggle_release(body: WindowToggle):
         ).fetchone()
         if not row:
             raise HTTPException(404, "无放行窗记录")
-        conn.execute("UPDATE release_windows SET status=? WHERE id=?", (body.状态, row["id"]))
+        now = now_str()
+        if body.状态 == "窗开":
+            conn.execute(
+                "UPDATE release_windows SET status=?, last_opened_at=? WHERE id=?",
+                (body.状态, now, row["id"]),
+            )
+        else:
+            conn.execute(
+                "UPDATE release_windows SET status=?, last_closed_at=? WHERE id=?",
+                (body.状态, now, row["id"]),
+            )
         audit(conn, "放行窗", row["id"], body.状态, body.环境)
-        return {"环境": body.环境, "状态": body.状态, "时间": now_str()}
+        return {"环境": body.环境, "状态": body.状态, "时间": now}
 
 
 @router.post("/回滚窗/切换")

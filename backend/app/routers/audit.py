@@ -6,14 +6,16 @@ router = APIRouter(tags=["审计"])
 
 
 @router.get("/审计")
-def list_audit():
+def list_audit(时段外: bool = False):
     with db() as conn:
+        where = "WHERE action LIKE '时段外%'" if 时段外 else ""
         return rows_to_list(
             conn.execute(
-                """
+                f"""
                 SELECT id AS 编号, kind AS 类别, ref_id AS 关联编号,
                        action AS 动作, created_at AS 时间, note AS 备注
-                FROM audit_events ORDER BY id DESC LIMIT 200
+                FROM audit_events {where}
+                ORDER BY id DESC LIMIT 200
                 """
             ).fetchall()
         )
